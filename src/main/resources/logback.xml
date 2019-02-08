@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<!-- configuration file for LogBack (slf4J implementation) See here for more 
+	details: http://gordondickens.com/wordpress/2013/03/27/sawing-through-the-java-loggers/ -->
+<configuration>
+
+	<!-- <property name="DEV_HOME" value="D:/ess/logs" /> -->
+	<property name="DEV_HOME" value="/opt/cysdcbo/logs" />
+
+	<appender name="FILE-AUDIT"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${DEV_HOME}/cysdcbo.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{dd-MM-yyyy HH:mm:ss.SSS} - %msg%n
+			</Pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${DEV_HOME}/archived/debug-test.%d{dd-MM-yyyy}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>100MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+
+	</appender>
+
+ 	<appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+		<smtpHost>smtp.gmail.com</smtpHost>
+		<smtpPort>587</smtpPort>
+		<STARTTLS>true</STARTTLS>
+		<username>noreplyesshelp@gmail.com</username>
+		<password>ess@123#!</password>
+		<to>harsh@sdrc.co.in</to>
+		<to>aparajita@sdrc.co.in</to>
+		<subject>Exception Occurred in CYSDCBO in Production: %logger{20} </subject>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%date %-5level %logger - %message%n</pattern>
+		</layout>
+	</appender>
+
+	<logger name="org.sdrc.cysdcbo" level="error" additivity="false">
+		<appender-ref ref="FILE-AUDIT" />
+	</logger>
+
+	<root level="error">
+<!-- 		<appender-ref ref="FILE-AUDIT" /> -->
+		<!-- for console -->
+<!-- 		<appender-ref ref="STDOUT" /> -->
+	 	<appender-ref ref="EMAIL" />
+	</root>
+
+</configuration>

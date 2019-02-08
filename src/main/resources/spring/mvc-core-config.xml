@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="contentNegotiationManager" ref="cnManager"  />
+
+		<property name="viewResolvers">
+			<list>
+				<!-- Default viewClass: JSTL view (JSP with html output) -->
+				<bean
+					class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<!-- Example: a logical view name of 'vets' is mapped to '/WEB-INF/jsp/vets.jsp' -->
+					<property name="prefix" value="/WEB-INF/jsp/" />
+					<property name="suffix" value=".jsp"></property>
+				</bean>
+
+				<!-- Used here for 'xml' and 'atom' views -->
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- Simple strategy: only path extension is taken into account -->
+	<bean id="cnManager"
+		class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="favorPathExtension" value="true" />
+		<property name="ignoreAcceptHeader" value="true" />
+		<property name="defaultContentType" value="text/html" />
+
+		<property name="mediaTypes">
+			<map>
+				<entry key="html" value="text/html" />
+				<entry key="xml" value="application/xml" />
+				<entry key="atom" value="application/atom+xml" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- all resources inside folder src/main/webapp/resources are mapped so 
+		they can be refered to inside JSP files (see header.jsp for more details) -->
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	<mvc:resources mapping="/views/**" location="/WEB-INF/jsp/pageViews/" />
+
+	<!-- uses WebJars so Javascript and CSS libs can be declared as Maven dependencies 
+		(Bootstrap, jQuery...) -->
+	<mvc:resources mapping="/webjars/**"
+		location="classpath:/META-INF/resources/webjars/" />
+
+	<mvc:view-controller path="/" view-name="home" />
+	<mvc:view-controller path="/home" view-name="home" />
+	<mvc:view-controller path="/dashboard" view-name="Dashboard" />
+	<mvc:view-controller path="/dataTree" view-name="dataTree" />
+	<mvc:view-controller path="/exception" view-name="exception" />
+	<mvc:view-controller path="/contactUS" view-name="contactUS" />
+	<mvc:view-controller path="/privacyPolicy" view-name="privacyPolicy" />
+	<mvc:view-controller path="/resource" view-name="tools" />
+	<!-- serve static resources (*.html, ...) from src/main/webapp/ -->
+	<mvc:default-servlet-handler />
+
+			<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<!-- view name resolved using bean of type InternalResourceViewResolver 
+			(declared in mvc-view-config.xml) -->
+		<property name="defaultErrorView" value="exception" />
+		<!-- results into 'WEB-INF/jsp/exception.jsp' -->
+		<property name="warnLogCategory" value="warn" />
+		<!-- needed otherwise exceptions won't be logged anywhere -->
+	</bean>
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- one of the properties available; the maximum file size in bytes -->
+		<property name="maxUploadSize" value="15730000" />
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="jsonMessageConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="jsonMessageConverter"
+		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+	</bean>
+
+</beans>

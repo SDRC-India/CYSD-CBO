@@ -1,0 +1,31 @@
+#spinner{
+	width: 50px;
+    height: 50px;
+    border: 3px solid #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 2000;
+    margin: auto;
+    border-top: 4px solid #367c91;
+    border-top-style: dotted;
+    border-radius: 100%;
+    animation: spin 1s infinite cubic-bezier(0.27, 1.07, 0.79, 0.93);
+}
+@keyframes spin{
+	from{
+		transform: rotate(0deg);
+	}to{
+		transform: rotate(360deg);
+	}
+}
+#loader-mask{
+	width: 100%;
+    height: 100%;
+    position: fixed;
+    background: rgba(191, 190, 190, 0.5);
+    top: 0;
+    z-index: 1999;
+}
